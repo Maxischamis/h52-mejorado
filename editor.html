@@ -1,10 +1,111 @@
 <!doctype html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Editor de diseño y carta</title><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="editor-studio.css"><script defer src="assets/lucide.min.js"></script><script defer src="assets/offline-data.js"></script><script defer src="config-utils.js"></script><script defer src="editor.js"></script></head>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Editor de diseño y carta</title>
+    <link rel="stylesheet" href="editor.css">
+    <link rel="stylesheet" href="editor-studio.css">
+    <script defer src="assets/lucide.min.js"></script>
+    <script defer src="assets/offline-data.js"></script>
+    <script defer src="config-utils.js"></script>
+    <script defer src="editor.js"></script>
+</head>
+
 <body>
-<header><a href="index.html" title="Volver a la web" aria-label="Volver a la web"><i data-lucide="arrow-left"></i></a><h1>Diseño & carta</h1><div class="history-tools"><button id="undo" title="Deshacer" aria-label="Deshacer" disabled><i data-lucide="undo-2"></i></button><button id="redo" title="Rehacer" aria-label="Rehacer" disabled><i data-lucide="redo-2"></i></button></div><div class="downloads"><button id="download-design"><i data-lucide="download"></i>Diseño JSON</button><button id="download-products"><i data-lucide="download"></i>Productos JSON</button></div></header>
-<main><section class="editor-panel"><nav class="editor-tabs"><button data-tab="design" class="active">Diseño</button><button data-tab="products">Productos</button><button data-tab="json">JSON</button></nav><p id="editor-status" role="status">Cargando…</p><div id="draft-tools" hidden><span>Borrador disponible</span><button id="restore-draft">Recuperar</button></div>
-<div id="design-tab" class="editor-view"><details open><summary>Identidad</summary><div id="brand-fields"></div></details><details open><summary>Colores</summary><div id="theme-presets" class="theme-presets"></div><div id="color-fields" class="color-fields"></div></details><details><summary>Tipografía & formato</summary><div id="format-fields"></div></details><details><summary>Portada</summary><div id="hero-fields"></div></details><details><summary>Secciones de inicio</summary><div id="section-fields"></div></details><details><summary>Navegación & pie</summary><div id="other-fields"></div></details><details><summary>Textos de la carta</summary><div id="label-fields"></div></details></div>
-<div id="products-tab" class="editor-view" hidden><details><summary>Categorías</summary><div class="product-tools"><select id="category-select" aria-label="Seleccionar categoría"></select><button id="new-category" title="Nueva categoría" aria-label="Nueva categoría"><i data-lucide="plus"></i></button></div><div id="category-fields"></div></details><div class="product-tools"><select id="product-select" aria-label="Seleccionar producto"></select><button id="new-product" title="Nuevo producto" aria-label="Nuevo producto"><i data-lucide="plus"></i></button><button id="duplicate-product" title="Duplicar producto" aria-label="Duplicar producto"><i data-lucide="copy"></i></button><button id="delete-product" title="Eliminar producto" aria-label="Eliminar producto"><i data-lucide="trash-2"></i></button></div><div id="product-fields"></div></div>
-<div id="json-tab" class="editor-view" hidden><div class="file-controls"><label class="file-button"><i data-lucide="upload"></i>Cargar diseño<input type="file" id="import-design" accept=".json,application/json"></label><label class="file-button"><i data-lucide="upload"></i>Cargar productos<input type="file" id="import-products" accept=".json,application/json"></label></div><label class="field">design.json<textarea id="raw-design" spellcheck="false" rows="18"></textarea></label><label class="field">products.json<textarea id="raw-products" spellcheck="false" rows="18"></textarea></label><button id="apply-json"><i data-lucide="check"></i>Aplicar JSON</button><button id="download-offline"><i data-lucide="download"></i>Copia para abrir sin servidor</button></div>
-</section><section class="preview-panel"><div class="preview-toolbar"><select id="preview-route" aria-label="Página de vista previa"><option value="inicio">Inicio</option><option value="carta">Carta</option></select><div><button class="active" data-width="desktop" title="Escritorio" aria-label="Escritorio"><i data-lucide="monitor"></i></button><button data-width="tablet" title="Tablet" aria-label="Tablet"><i data-lucide="tablet"></i></button><button data-width="mobile" title="Celular" aria-label="Celular"><i data-lucide="smartphone"></i></button><a href="index.html" target="_blank" title="Abrir web" aria-label="Abrir web"><i data-lucide="external-link"></i></a></div></div><div class="preview-stage"><iframe id="preview" src="index.html" title="Vista previa del diseño"></iframe></div></section></main>
-</body></html>
+    <header><a href="index.html" title="Volver a la web" aria-label="Volver a la web"><i
+                data-lucide="arrow-left"></i></a>
+        <h1>Diseño & carta</h1>
+        <div class="history-tools"><button id="undo" title="Deshacer" aria-label="Deshacer" disabled><i
+                    data-lucide="undo-2"></i></button><button id="redo" title="Rehacer" aria-label="Rehacer" disabled><i
+                    data-lucide="redo-2"></i></button></div>
+        <div class="downloads"><button id="download-design"><i data-lucide="download"></i>Diseño JSON</button><button
+                id="download-products"><i data-lucide="download"></i>Productos JSON</button></div>
+    </header>
+    <main>
+        <section class="editor-panel">
+            <nav class="editor-tabs"><button data-tab="design" class="active">Diseño</button><button
+                    data-tab="products">Productos</button><button data-tab="json">JSON</button></nav>
+            <p id="editor-status" role="status">Cargando…</p>
+            <div id="draft-tools" hidden><span>Borrador disponible</span><button id="restore-draft">Recuperar</button>
+            </div>
+            <div id="design-tab" class="editor-view">
+                <details open>
+                    <summary>Identidad</summary>
+                    <div id="brand-fields"></div>
+                </details>
+                <details open>
+                    <summary>Colores</summary>
+                    <div id="theme-presets" class="theme-presets"></div>
+                    <div id="color-fields" class="color-fields"></div>
+                </details>
+                <details>
+                    <summary>Tipografía & formato</summary>
+                    <div id="format-fields"></div>
+                </details>
+                <details>
+                    <summary>Portada</summary>
+                    <div id="hero-fields"></div>
+                </details>
+                <details>
+                    <summary>Secciones de inicio</summary>
+                    <div id="section-fields"></div>
+                </details>
+                <details>
+                    <summary>Navegación & pie</summary>
+                    <div id="other-fields"></div>
+                </details>
+                <details>
+                    <summary>Textos de la carta</summary>
+                    <div id="label-fields"></div>
+                </details>
+            </div>
+            <div id="products-tab" class="editor-view" hidden>
+                <details>
+                    <summary>Categorías</summary>
+                    <div class="product-tools"><select id="category-select"
+                            aria-label="Seleccionar categoría"></select><button id="new-category"
+                            title="Nueva categoría" aria-label="Nueva categoría"><i data-lucide="plus"></i></button>
+                    </div>
+                    <div id="category-fields"></div>
+                </details>
+                <div class="product-tools"><select id="product-select"
+                        aria-label="Seleccionar producto"></select><button id="new-product" title="Nuevo producto"
+                        aria-label="Nuevo producto"><i data-lucide="plus"></i></button><button id="duplicate-product"
+                        title="Duplicar producto" aria-label="Duplicar producto"><i
+                            data-lucide="copy"></i></button><button id="delete-product" title="Eliminar producto"
+                        aria-label="Eliminar producto"><i data-lucide="trash-2"></i></button></div>
+                <div id="product-fields"></div>
+            </div>
+            <div id="json-tab" class="editor-view" hidden>
+                <div class="file-controls"><label class="file-button"><i data-lucide="upload"></i>Cargar diseño<input
+                            type="file" id="import-design" accept=".json,application/json"></label><label
+                        class="file-button"><i data-lucide="upload"></i>Cargar productos<input type="file"
+                            id="import-products" accept=".json,application/json"></label></div><label
+                    class="field">design.json<textarea id="raw-design" spellcheck="false"
+                        rows="18"></textarea></label><label class="field">products.json<textarea id="raw-products"
+                        spellcheck="false" rows="18"></textarea></label><button id="apply-json"><i
+                        data-lucide="check"></i>Aplicar JSON</button><button id="download-offline"><i
+                        data-lucide="download"></i>Copia para abrir sin servidor</button>
+            </div>
+        </section>
+        <section class="preview-panel">
+            <div class="preview-toolbar"><select id="preview-route" aria-label="Página de vista previa">
+                    <option value="inicio">Inicio</option>
+                    <option value="carta">Carta</option>
+                </select>
+                <div><button class="active" data-width="desktop" title="Escritorio" aria-label="Escritorio"><i
+                            data-lucide="monitor"></i></button><button data-width="tablet" title="Tablet"
+                        aria-label="Tablet"><i data-lucide="tablet"></i></button><button data-width="mobile"
+                        title="Celular" aria-label="Celular"><i data-lucide="smartphone"></i></button><a
+                        href="index.html" target="_blank" title="Abrir web" aria-label="Abrir web"><i
+                            data-lucide="external-link"></i></a></div>
+            </div>
+            <div class="preview-stage"><iframe id="preview" src="index.html" title="Vista previa del diseño"></iframe>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
