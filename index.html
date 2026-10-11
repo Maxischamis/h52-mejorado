@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080b0c">
+  <title>H52</title><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="design.css"><link rel="stylesheet" href="refinement.css"><link rel="stylesheet" href="experience.css"><link rel="stylesheet" href="single-page.css?v=3">
+  <style>#sort,.quick-filters,.favorites-filter,#selection-label{display:none!important}.filter-row{grid-template-columns:1fr}</style>
+  <script defer src="assets/lucide.min.js"></script><script defer src="assets/offline-data.js"></script><script defer src="config-utils.js"></script><script defer src="order-utils.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <p id="load-error" role="alert" hidden></p>
+  <header class="site-header">
+    <a class="brand" href="#inicio"></a>
+    <nav class="desktop-nav" aria-label="Principal"><a href="#inicio" data-nav="home"></a><a href="#carta" data-nav="menu"></a></nav>
+    <div class="header-actions"><label class="table"><i data-lucide="armchair"></i><select id="table"></select></label><button class="icon-button header-favorite" data-toggle-favorites aria-pressed="false"><i data-lucide="heart"></i><span id="favorite-count" class="counter" hidden></span></button><button class="icon-button cart-toggle"><i data-lucide="shopping-bag"></i><span id="count" class="counter" hidden></span></button><button class="icon-button menu-toggle" aria-controls="mobile-menu" aria-expanded="false"><i data-lucide="menu"></i></button></div>
+    <nav id="mobile-menu" class="mobile-menu" hidden><a href="#inicio"><i data-lucide="house"></i><span data-nav="home"></span><i data-lucide="arrow-up-right"></i></a><a href="#carta"><i data-lucide="utensils"></i><span data-nav="menu"></span><i data-lucide="arrow-up-right"></i></a></nav>
+  </header>
+  <main id="inicio">
+    <section class="hero" id="hero">
+      <img alt="" fetchpriority="high">
+      <div class="hero-inner"><div class="hero-copy"><p class="eyebrow"></p><h1></h1><div class="red-rule"></div><p class="hero-description"></p><a class="outline-button" href="#carta"><span class="hero-cta-text"></span><i data-lucide="arrow-up-right"></i></a></div><span class="hero-caption"></span><span class="hero-side-note" aria-hidden="true">01 / 04</span></div>
+    </section>
+    <div class="workspace"><section class="catalog" id="carta">
+      <div id="categories" class="categories"></div>
+      <div class="catalog-controls" id="catalog-controls"><div class="section-heading"><div><p class="eyebrow" data-label="catalogEyebrow"></p><h2 id="heading"></h2><p id="category-description"></p></div><span id="result-count" aria-live="polite"></span></div><div class="filter-row"><div class="search"><i data-lucide="search"></i><input id="search" type="search"><button id="clear-search" class="clear-search" hidden><i data-lucide="x"></i></button></div><select id="sort" aria-label="Ordenar"></select></div><div class="catalog-toolbar"><div class="quick-filters"><label><input type="checkbox" id="available-only"><span data-label="availableOnly"></span></label><label><input type="checkbox" id="featured-only"><span data-label="featuredOnly"></span></label><select id="dietary-filter"></select></div><div class="view-switch" role="group"><button data-layout="grid"><i data-lucide="layout-grid"></i></button><button data-layout="list"><i data-lucide="list"></i></button></div></div><span id="selection-label" class="selection-label"></span></div>
+      <div class="favorites-filter"><label><input type="checkbox" id="favorites-only"><span data-nav="favorites"></span></label></div><div id="products" class="products"></div>
+    </section></div>
+  </main>
+  <footer><div><a class="brand" href="#inicio"></a><p class="footer-eyebrow"></p></div><p class="footer-message"></p><div class="footer-links"><a href="#carta"><span class="footer-link-text"></span><i data-lucide="arrow-up-right"></i></a><a class="icon-button editor-link" href="editor.html"><i data-lucide="sliders-horizontal"></i></a></div></footer>
+  <div id="backdrop" hidden></div>
+  <aside id="order" aria-modal="true" role="dialog" aria-labelledby="order-title" hidden><div class="order-heading"><div><p class="eyebrow" id="order-table"></p><h2 id="order-title" data-label="orderTitle"></h2></div><button class="icon-button close-order"><i data-lucide="x"></i></button></div><div id="order-items"></div><div id="totals"></div></aside>
+  <button id="mobile-cart" class="mobile-cart cart-toggle" hidden></button>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <dialog id="details" aria-labelledby="detail-title"><button class="icon-button" id="close-details"><i data-lucide="x"></i></button><div id="details-content"></div></dialog>
+  <dialog id="confirmation" aria-labelledby="confirmation-title"><button class="icon-button" id="close-confirm"><i data-lucide="x"></i></button><i data-lucide="clipboard-check"></i><p class="eyebrow" data-label="confirmationEyebrow"></p><h2 id="confirmation-title" data-label="confirmationTitle"></h2><p data-label="confirmationDescription"></p><div id="summary"></div><button class="primary" id="continue"><span data-label="continue"></span><i data-lucide="arrow-right"></i></button></dialog>
+</body>
+</html>

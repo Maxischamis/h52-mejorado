@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const design=JSON.parse(fs.readFileSync(path.join(root,'config/design.json'),'utf8'));
+const catalog=JSON.parse(fs.readFileSync(path.join(root,'config/products.json'),'utf8'));
+const context={window:{},Intl};
+vm.runInNewContext(fs.readFileSync(path.join(root,'config-utils.js'),'utf8'),context);
+context.window.H52Data.validate(design,catalog);
+fs.writeFileSync(path.join(root,'assets/offline-data.js'),`window.H52_OFFLINE_DATA = ${JSON.stringify({design,catalog})};\n`);
+console.log('JSON validos. Copia sin servidor actualizada.');
