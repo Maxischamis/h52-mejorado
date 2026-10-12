@@ -17,7 +17,7 @@
     "secondary": "#b5d5ca",
     "border": "#303a3b",
     "heroShade": "#080b0c",
-    "fontDisplay": "'Bodoni 72', 'Didot', 'Times New Roman', serif",
+    "fontDisplay": "Trebuchet MS, sans-serif",
     "fontBody": "Arial, Helvetica, sans-serif",
     "cardRadius": 8,
     "contentWidth": 1320
