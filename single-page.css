@@ -29,3 +29,6 @@
 .product-bottom .price {font-size:21px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .detail-price strong {font-size:28px}
 @media(max-width:600px) {.product-bottom .price {font-size:19px}}
+.hero h1>span {overflow-wrap:normal;word-break:normal;hyphens:none}
+@media(max-width:700px) {.hero h1 {font-size:48px}.hero-copy {max-width:100%}}
+@media(max-width:360px) {.hero h1 {font-size:42px}}
