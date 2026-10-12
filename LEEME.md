@@ -1,6 +1,6 @@
 # Diseño y Carta
 
-Web independiente, sin Base44 ni cuentas. Contiene los 177 productos importados en 13 categorías, con precios y extras. Inicio y Carta están en una sola página; favoritos es un filtro. Las fotos ilustrativas actuales están guardadas localmente y funcionan sin conexión. No son fotos reales del negocio ni de sus envases comerciales. El pedido puede conectarse a Supabase para que lo reciban mozos y cocina en tiempo real; sin esa configuración queda en modo local de prueba.
+Web independiente, sin Base44 ni cuentas. Contiene los 177 productos importados en 13 categorías, con precios y extras. Inicio y Carta están en una sola página; favoritos es un filtro. Las fotos ilustrativas actuales están guardadas localmente y funcionan sin conexión. No son fotos reales del negocio ni de sus envases comerciales. Los pedidos se guardan en un archivo JSON privado mediante el servidor incluido; mozos y cocina reciben actualizaciones en vivo.
 
 ## Abrir
 
@@ -60,60 +60,22 @@ La vista previa cambia en vivo. Para conservar los cambios, descargar `design.js
 
 Al publicar, subir la carpeta completa a un hosting estático: la web consumirá directamente los dos JSON. No requiere compilación, paquetes ni Base44.
 
-## Pedidos En Tiempo Real
+## Pedidos Con Archivos JSON
 
-GitHub Pages sólo publica archivos estáticos: no guarda pedidos, no autentica mozos y no empuja cambios en vivo por sí solo. Para producción, crear un proyecto en Supabase y ejecutar el archivo `supabase-h52.sql` en el SQL Editor. Ese SQL crea la tabla `h52_orders`, activa RLS, permite que clientes creen pedidos nuevos, exige usuarios autenticados para que mozos/cocina vean o cambien estados, agrega índices y habilita Realtime.
+No se usa base de datos. Un servidor Node.js 22 o superior guarda y edita `private-data/orders.json`. Los productos siguen en `config/products.json` y el editor conserva su funcionamiento.
 
-Después, copiar `config/backend.example.js` sobre `config/backend.js` y completar:
-
-```js
-window.H52_BACKEND = {
-  supabaseUrl: "https://TU-PROYECTO.supabase.co",
-  supabasePublishableKey: "TU_PUBLISHABLE_KEY",
-  restaurantId: "h52",
-  enabled: true
-};
+Inicio:
+```sh
+H52_WAITER_PASSWORD='clave-larga-mozo' H52_KITCHEN_PASSWORD='clave-larga-cocina' node server.mjs
 ```
 
-Crear usuarios del equipo en Supabase Auth para quienes usen `mozo.html` y `cocina.html`. No poner claves `service_role` ni claves secretas en estos archivos porque se publican en el navegador. El identificador `client_order_id` evita duplicados cuando un cliente reintenta enviar el mismo pedido. En Supabase, revisar que la tabla `h52_orders` esté incluida en la publicación `supabase_realtime`; el SQL lo intenta hacer automáticamente.
+Abrir http://localhost:8787 para carta, /mozo.html para mozos y /cocina.html para cocina. Las claves se configuran en el servidor; nunca en JSON publico.
 
-Foto de portada creada con ImageGen: Negroni en cristal tallado, naranja y romero sobre barra oscura, vaso a la derecha y espacio libre a la izquierda, fotografía editorial sin texto.
-# Refinamiento de la app
+Para usar celulares, mantener el servidor encendido y acceder por su IP en la misma red. Para acceso desde Internet, alojar en un servidor con HTTPS y disco persistente. Configurar H52_SECURE_COOKIE=true en HTTPS. Usar una unica instancia: las escrituras se serializan y reemplazan el JSON de forma atomica. No escalar a varios procesos compartiendo el archivo.
 
-La carta completa se muestra agrupada por tipo. Todos limpia filtros y
-busqueda; ninguna cantidad de destacados limita la carta. Ver `EDITAR.md`.
+GitHub Pages no ejecuta Node ni edita JSON. Se recomienda publicar carta y equipo en el mismo dominio del servidor. Si la carta queda en Pages, configurar apiUrl en config/backend.js y H52_ALLOWED_ORIGIN=https://maxischamis.github.io en el servidor; abrir las pantallas del equipo directamente en el dominio del servidor para evitar restricciones de cookies entre sitios.
 
-Cada producto admite `customization.removable` (opciones para quitar) y
-`customization.allowNote` (indicaciones escritas). Las personalizaciones se conservan
-en el pedido y resumen; versiones distintas de un mismo producto son lineas separadas.
-Los pedidos guardados del formato anterior se migran al cargarlos. Las opciones de
-quitar no cambian el precio. Los extras pagos se suman por unidad y aparecen en
-el carrito y resumen. Se conservan los ingredientes, alergenos y clasificación del archivo importado.
+H52_DATA_DIR cambia la carpeta de datos. Realizar copias de seguridad del JSON. Para editar manualmente orders.json, detener el servidor, editar un array JSON valido y reiniciar; el archivo se carga al inicio. Los estados se editan desde las pantallas y se guardan automaticamente. Nunca publicar pedidos, claves ni private-data en GitHub.
 
-Las fichas de producto tienen foto amplia, favoritos, datos de alergenos y selector
-de cantidad con precio total antes de agregar al pedido. Se respeta el limite por
-producto configurado en el JSON. En celular, la ficha se abre como panel inferior.
-El resumen del pedido permanece accesible al recorrer pedidos largos.
-
-El editor guarda un borrador valido en este navegador y ofrece recuperarlo al volver
-a abrirlo. Ese borrador no reemplaza los JSON: los archivos exportados siguen siendo
-la configuracion de la app. La paleta indica la relacion de contraste para texto y
-botones; los carritos de vista previa se guardan separados del carrito de la web.
-
-La navegacion inferior fue reemplazada por un menu desplegable en el encabezado.
-La carta tiene categorias compactas fijas al desplazarse, titulos por categoria y
-fotos sin marcos adicionales. El pedido flotante aparece solo cuando hay productos.
-
-El editor incorpora tres paletas, colores hexadecimales, historial de deshacer y
-rehacer, paneles plegables, edicion y creacion de categorias, duplicado de productos,
-textos de la portada y de la carta. La vista previa permite
-elegir inicio/carta y escritorio/tablet/celular. Los cambios del editor
-son temporales hasta exportar y reemplazar los JSON correspondientes.
-
-La carta incluye vistas de grilla y lista, filtros de disponibilidad y destacados,
-borrado rapido de busqueda y cantidades visibles en cada producto. Las preferencias
-alimentarias se muestran como filtro cuando los productos tienen valores en
-`classification.dietary`; no se infieren restricciones ni alergenos.
-La mesa y la vista elegida se recuerdan en este navegador. Los textos nuevos se
-editan en `design.json`, dentro de `labels`.
+El servidor valida productos y precios usando el catalogo, evita duplicados por clientOrderId, restringe acciones por rol y transmite cambios con Server-Sent Events. Las sesiones duran 12 horas y se cierran al reiniciar. El limite por IP reduce spam; los pedidos publicos aun pueden requerir proteccion adicional en un despliegue abierto.
 

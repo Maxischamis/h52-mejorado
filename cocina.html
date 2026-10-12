@@ -4,12 +4,12 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>H52 | Cocina</title>
   <link rel="stylesheet" href="staff.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script defer src="config/backend.js"></script><script defer src="h52-backend.js"></script><script defer src="staff.js"></script>
 </head>
 <body data-role="kitchen">
   <header class="staff-header"><a class="brand" href="index.html">H52</a><nav class="staff-nav"><a href="mozo.html">Mozos</a><a class="active" href="cocina.html">Cocina</a><a href="index.html">Carta</a><span id="mode" class="pill">Conectando</span></nav></header>
-  <section id="login" class="login" hidden><p class="eyebrow">Acceso del equipo</p><h1>Cocina</h1><form id="login-form"><label>Email<input id="email" type="email" autocomplete="email" required></label><label>Clave<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">Ingresar</button><p id="login-error" class="muted"></p></form></section>
-  <main id="app" hidden><div class="topline"><div><p class="eyebrow">Comandas</p><h1>Cocina</h1><p class="muted">Acá entran sólo los pedidos que el mozo envió a cocina.</p></div></div><section id="orders" class="orders"></section></main>
+  <section id="login" class="login" hidden><p class="eyebrow">Acceso del equipo</p><h1>Cocina</h1><form id="login-form"><label>Clave<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">Ingresar</button><p id="login-error" class="muted"></p></form></section>
+  <main id="app" hidden><div class="topline"><div><p class="eyebrow">Comandas</p><h1>Cocina</h1></div></div><div class="controls"><input id="search-table" type="search" placeholder="Buscar mesa" aria-label="Buscar mesa"><select id="filter" aria-label="Estado"><option value="">Todos los activos</option value="new">Nuevos</option><option value="sent_to_kitchen">En espera</option><option value="preparing">Preparando</option><option value="ready">Listos</option><option value="delivered">Entregados</option><option value="cancelled">Cancelados</option></select><span id="summary" aria-live="polite"></span><button id="logout" class="secondary">Salir</button></div><p id="staff-error" role="alert"></p><section id="orders" class="orders"></section></main>
 </body>
 </html>

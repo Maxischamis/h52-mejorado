@@ -125,6 +125,7 @@ function orderPayload() {
         unitPrice: H52Order.unitPrice(line,products),
         total: H52Order.unitPrice(line,products)*line.quantity,
         without: line.without,
+        extraIds: line.extras || [],
         extras: (line.extras||[]).map(id=>p.extras?.find(e=>String(e.id)===id)?.name||id),
         notes: line.note
       };
