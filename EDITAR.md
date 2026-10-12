@@ -35,6 +35,18 @@ GitHub Pages solo sirve archivos: subir el codigo a Git no instala este servidor
 
 ### Copias locales o GitHub Pages
 
+En GitHub Pages el editor ofrece **Publicar en GitHub**. Requiere un token
+fine-grained del propietario limitado a este repositorio, con permiso
+Contents: Read and write y vencimiento corto. El token queda solo en memoria,
+se limpia del formulario al conectar y se elimina al desconectar o recargar.
+Nunca se exporta junto al borrador. No copies tokens en chats ni en el codigo.
+
+Los JSON de diseño/productos y la copia offline se publican juntos en un commit.
+La rama no se fuerza: si otro editor publico primero, se rechaza el guardado
+para que puedas revisar la version compartida. GitHub Pages tarda en desplegar;
+la carta consulta cada 30 segundos y el editor consulta GitHub cada 1-2 minutos.
+Los pedidos no se guardan en GitHub: necesitan el servidor JSON existente.
+
 1. Abrí `Abrir.command` y entrá a `editor.html`.
 2. En Productos, elegí el plato y su categoría.
 3. En Personalización del pedido, escribí una opción por línea: Papas, Cebolla, Salsa.

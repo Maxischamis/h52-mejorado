@@ -12,7 +12,9 @@
     <script defer src="config-utils.js"></script>
     <script defer src="config/backend.js"></script>
     <script defer src="h52-backend.js"></script>
-    <script defer src="editor-sync.js"></script>
+    <script defer src="config/github.js"></script>
+    <script defer src="editor-github.js"></script>
+    <script defer src="editor-sync.js?v=3"></script>
     <script defer src="editor-tools.js?v=2"></script>
     <script defer src="editor.js?v=2"></script>
 </head>
@@ -36,6 +38,8 @@
                 <form id="shared-login" hidden><label>Clave de salon<input id="shared-password" type="password" autocomplete="current-password" required></label><button type="submit">Ingresar</button></form>
                 <button id="shared-save" disabled><i data-lucide="save"></i>Guardar compartido</button>
                 <button id="shared-reload" disabled><i data-lucide="refresh-cw"></i>Recargar compartido</button>
+                <button id="shared-disconnect" hidden title="Desconectar GitHub" aria-label="Desconectar GitHub"><i data-lucide="log-out"></i></button>
+                <a id="github-token-link" hidden href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Autorizar GitHub</a>
             </div>
             <div id="draft-tools" hidden><span>Borrador disponible</span><button id="restore-draft">Recuperar</button>
             </div>
