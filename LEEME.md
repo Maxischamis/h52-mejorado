@@ -79,3 +79,14 @@ H52_DATA_DIR cambia la carpeta de datos. Realizar copias de seguridad del JSON. 
 
 El servidor valida productos y precios usando el catalogo, evita duplicados por clientOrderId, restringe acciones por rol y transmite cambios con Server-Sent Events. Las sesiones duran 12 horas y se cierran al reiniciar. El limite por IP reduce spam; los pedidos publicos aun pueden requerir proteccion adicional en un despliegue abierto.
 
+
+## Panel De Servicio
+
+Salon ofrece tablero de mesas, pedidos activos e historial. Permite tomar pedidos desde el panel con productos del catalogo, cantidades, extras y observaciones. Las indicaciones internas y la prioridad se guardan en orders.json y llegan a cocina.
+
+Cocina separa comandas en espera, preparando y listas. Permite marcar productos terminados y consultar la vista Produccion, que agrupa unidades pendientes por producto y personalizacion. Las comandas se pueden imprimir y salon puede descargar los pedidos como JSON.
+
+config/staff.json controla el nombre del equipo, el umbral de demora en minutos, la frecuencia de refresco de respaldo y el aviso sonoro inicial. Las mesas se configuran en config/design.json, dentro de order.tables. El sonido debe habilitarse mediante el control del navegador para activar el audio.
+
+Cada pedido guarda revision, priority, staffNotes, preparedItems e history. Los cambios simultaneos se rechazan para evitar sobrescribir el trabajo de otra persona. orders.previous.json conserva la version anterior al ultimo guardado. El archivo .writer.lock impide ejecutar dos servidores sobre la misma carpeta. Estos archivos son privados y no se publican.
+

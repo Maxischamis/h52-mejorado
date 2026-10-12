@@ -1,15 +1,45 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>H52 | Mozos</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#16191b">
+  <title>H52 | Salón</title>
   <link rel="stylesheet" href="staff.css">
-
-  <script defer src="config/backend.js"></script><script defer src="h52-backend.js"></script><script defer src="staff.js"></script>
+  <script defer src="assets/lucide.min.js"></script>
+  <script defer src="config/backend.js"></script>
+  <script defer src="h52-backend.js"></script>
+  <script type="module" src="staff.js"></script>
 </head>
 <body data-role="waiter">
-  <header class="staff-header"><a class="brand" href="index.html">H52</a><nav class="staff-nav"><a class="active" href="mozo.html">Mozos</a><a href="cocina.html">Cocina</a><a href="index.html">Carta</a><span id="mode" class="pill">Conectando</span></nav></header>
-  <section id="login" class="login" hidden><p class="eyebrow">Acceso del equipo</p><h1>Mozos</h1><form id="login-form"><label>Clave<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">Ingresar</button><p id="login-error" class="muted"></p></form></section>
-  <main id="app" hidden><div class="topline"><div><p class="eyebrow">Pedidos recibidos</p><h1>Mozos</h1></div></div><div class="controls"><input id="search-table" type="search" placeholder="Buscar mesa" aria-label="Buscar mesa"><select id="filter" aria-label="Estado"><option value="">Todos los activos</option value="new">Nuevos</option><option value="sent_to_kitchen">En espera</option><option value="preparing">Preparando</option><option value="ready">Listos</option><option value="delivered">Entregados</option><option value="cancelled">Cancelados</option></select><span id="summary" aria-live="polite"></span><button id="logout" class="secondary">Salir</button></div><p id="staff-error" role="alert"></p><section id="orders" class="orders"></section></main>
+  <aside class="sidebar">
+    <a class="brand" href="index.html"><strong>H52<span>.</span></strong><small>BAR & COCINA</small></a>
+    <p class="nav-label">SERVICIO</p>
+    <nav aria-label="Equipo">
+      <a href="mozo.html" aria-current="page"><i data-lucide="armchair"></i><span>Salón</span></a>
+      <a href="cocina.html" ><i data-lucide="chef-hat"></i><span>Cocina</span></a>
+      <a href="index.html"><i data-lucide="book-open"></i><span>Carta</span></a>
+    </nav>
+    <div class="sidebar-bottom"><span class="service-dot"></span> EQUIPO H52 <small id="calendar"></small></div>
+  </aside>
+  <div class="workspace">
+    <header class="staff-header"><div class="breadcrumb">Servicio <span>/</span> <strong>Salón</strong></div><div class="header-tools"><span id="mode" class="connection" role="status">Conectando</span><button id="refresh" class="icon-button" title="Actualizar pedidos" aria-label="Actualizar pedidos"><i data-lucide="refresh-cw"></i></button><label class="sound-switch" title="Aviso sonoro"><input id="sound" type="checkbox" aria-label="Aviso sonoro"><i data-lucide="volume-2"></i></label><button id="logout" class="icon-button" title="Cerrar sesión" aria-label="Cerrar sesión" hidden><i data-lucide="log-out"></i></button></div></header>
+    <section id="login" class="login" hidden><div class="login-mark"><i data-lucide="armchair"></i></div><p class="eyebrow">EQUIPO H52</p><h1>El salón, en orden.</h1><form id="login-form"><label>Clave de mozos<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">Ingresár <i data-lucide="arrow-right"></i></button><p id="login-error" class="error" role="alert"></p></form></section>
+    <main id="app" hidden>
+      <div class="page-heading"><div><p class="eyebrow">SALÓN EN VIVO</p><h1>Cada mesa, a tiempo.</h1><p id="shift-summary" class="muted"></p></div><button id="new-order" class="primary"><i data-lucide="plus"></i> Tomar pedido</button></div>
+      <section id="metrics" class="metrics" aria-label="Resumen del servicio"></section>
+      <div class="viewbar"><div class="tabs" role="tablist" aria-label="Vistas"><button role="tab" data-view="tables" aria-selected="true"><i data-lucide="layout-grid"></i> Mesas</button><button role="tab" data-view="orders" aria-selected="false"><i data-lucide="receipt-text"></i> Pedidos</button><button role="tab" data-view="history" aria-selected="false"><i data-lucide="history"></i> Historial</button></div><span id="last-updated" class="muted"></span><button id="export-json" class="icon-button" title="Descargar pedidos JSON" aria-label="Descargar pedidos JSON"><i data-lucide="download"></i></button></div>
+      <div class="controls"><label class="search"><i data-lucide="search"></i><input id="search-table" type="search" placeholder="Mesa, producto o pedido" aria-label="Buscar pedidos"></label><select id="filter" aria-label="Estado"><option value="">Todos los estados</option><option value="new">Nuevos</option><option value="sent_to_kitchen">En espera</option><option value="preparing">Preparando</option><option value="ready">Listos</option><option value="delivered">Entregados</option><option value="cancelled">Cancelados</option></select><select id="sort" aria-label="Orden"><option value="priority">Prioridad y espera</option><option value="oldest">Más antiguos</option><option value="newest">Más recientes</option><option value="table">Número de mesa</option></select><label class="urgent-toggle"><input id="urgent-only" type="checkbox">Solo urgentes</label><span id="summary"></span></div>
+      <p id="staff-error" class="error" role="alert" hidden></p>
+      <section id="table-grid" class="table-grid" aria-label="Mesas"></section>
+      <section id="orders" class="orders" aria-label="Pedidos"></section>
+      <section id="production" class="production" aria-label="Producción" hidden></section>
+    </main>
+  </div>
+  <dialog id="detail-dialog" class="drawer" aria-labelledby="detail-title"><header class="dialog-header"><div><p class="eyebrow">COMANDA H52</p><h2 id="detail-title"></h2></div><button class="icon-button" data-close="detail-dialog" aria-label="Cerrar detalle"><i data-lucide="x"></i></button></header><div id="detail-body"></div><footer id="detail-actions"></footer></dialog>
+  <dialog id="compose-dialog" class="compose" aria-labelledby="compose-title"><header class="dialog-header"><div><p class="eyebrow">SALÓN</p><h2 id="compose-title">Tomar pedido</h2></div><button class="icon-button" data-close="compose-dialog" aria-label="Cerrar pedido"><i data-lucide="x"></i></button></header><form id="compose-form"><div class="compose-top"><label>Mesa<select id="compose-table" required></select></label><label class="search"><i data-lucide="search"></i><input id="product-search" type="search" placeholder="Buscar en la carta" aria-label="Buscar productos"></label></div><div class="compose-grid"><div id="catalog-list" class="catalog-list"></div><div class="compose-cart"><h3>Pedido <span id="compose-count">0</span></h3><div id="compose-lines"></div><label>Observaciónes<textarea id="compose-notes" maxlength="1000" placeholder="Observaciónes para este pedido"></textarea></label><div class="compose-total"><span>Total</span><strong id="compose-total"></strong></div><p id="compose-error" class="error" role="alert"></p><button id="compose-submit" class="primary" type="submit">Guardar pedido <i data-lucide="check"></i></button></div></div></form></dialog>
+  <dialog id="confirm-dialog" class="confirmation" aria-labelledby="confirm-title"><h2 id="confirm-title">Cancelar pedido</h2><p id="confirm-description"></p><label>Motivo<textarea id="cancel-reason" maxlength="500" required></textarea></label><div class="confirm-actions"><button class="secondary" data-close="confirm-dialog">Volver</button><button id="confirm-cancel" class="danger">Cancelar pedido</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="print-area" hidden></div>
 </body>
 </html>

@@ -33,16 +33,40 @@ test('JSON: autenticacion, roles, duplicados concurrentes, precios y persistenci
     assert.equal(rows[0].items[0].notes, 'Bien cocida');
     assert.equal((await request('/orders', 'GET', null, kitchen.cookie)).data.length, 0);
     const path = '/orders/' + rows[0].id;
-    assert.equal((await request(path, 'PATCH', {status: 'ready'}, waiter.cookie)).status, 400);
-    assert.equal((await request(path, 'PATCH', {status: 'sent_to_kitchen'}, kitchen.cookie)).status, 400);
+    assert.equal((await request(path, 'PATCH', {status: 'ready'}, waiter.cookie)).status, 409);
+    assert.equal((await request(path, 'PATCH', {status: 'sent_to_kitchen'}, kitchen.cookie)).status, 409);
+    assert.equal((await request(path, 'PATCH', {staffNotes: 'Sale todo junto'}, kitchen.cookie)).status, 400);
+    const edits = await Promise.all([
+      request(path, 'PATCH', {staffNotes: 'Sale todo junto', priority: 'urgent', expectedRevision: 0}, waiter.cookie),
+      request(path, 'PATCH', {staffNotes: 'Otra indicacion', expectedRevision: 0}, waiter.cookie)
+    ]);
+    assert.deepEqual(edits.map(r=>r.status).sort(), [200,409]);
+    assert.equal((await request(path, 'PATCH', {totals: {total: 1}}, waiter.cookie)).status, 400);
     assert.equal((await request(path, 'PATCH', {status: 'sent_to_kitchen'}, waiter.cookie)).status, 200);
     assert.equal((await request(path, 'PATCH', {status: 'preparing'}, kitchen.cookie)).status, 200);
+    assert.equal((await request(path, 'PATCH', {preparedItems: [99]}, kitchen.cookie)).status, 400);
+    assert.equal((await request(path, 'PATCH', {preparedItems: [0]}, waiter.cookie)).status, 400);
+    assert.equal((await request(path, 'PATCH', {preparedItems: [0]}, kitchen.cookie)).status, 200);
     assert.equal((await request(path, 'PATCH', {status: 'ready'}, kitchen.cookie)).status, 200);
     assert.equal((await request(path, 'PATCH', {status: 'delivered'}, waiter.cookie)).status, 200);
-    assert.equal(JSON.parse(await readFile(join(dir, 'orders.json'), 'utf8'))[0].status, 'delivered');
+    const saved = JSON.parse(await readFile(join(dir, 'orders.json'), 'utf8'))[0];
+    assert.equal(saved.status, 'delivered');
+    assert.ok(saved.history.some(entry => entry.status === 'ready' && entry.actor === 'kitchen'));
+    assert.ok(saved.history.some(entry => entry.label === 'Indicaciones actualizadas'));
+    assert.equal(saved.staffNotes, 'Sale todo junto');
+    assert.equal(saved.priority, 'urgent');
+    assert.equal(JSON.parse(await readFile(join(dir, 'orders.previous.json'), 'utf8'))[0].status, 'ready');
+    const stream = await fetch('http://127.0.0.1:18987/api/events', {headers: {Cookie: waiter.cookie}, signal: AbortSignal.timeout(3000)});
+    const reader = stream.body.getReader();
+    assert.ok(new TextDecoder().decode((await reader.read()).value).includes('data:'));
+    const extraOrder = request('/orders', 'POST', {...input, clientOrderId: 'another-id'});
+    assert.ok(new TextDecoder().decode((await reader.read()).value).includes('data:'));
+    await extraOrder;
+    await request('/logout', 'POST', null, waiter.cookie);
+    assert.equal((await reader.read()).done, true);
     assert.equal((await fetch('http://127.0.0.1:18987/private-data/orders.json')).status, 404);
     await stop(); await start();
     const login = await request('/login', 'POST', {role: 'waiter', password: 'test-waiter'});
-    assert.equal((await request('/orders', 'GET', null, login.cookie)).data[0].status, 'delivered');
+    assert.equal((await request('/orders', 'GET', null, login.cookie)).data.find(o=>o.id===rows[0].id).status, 'delivered');
   } finally {if (child && child.exitCode === null) await stop(); await rm(dir, {recursive: true, force: true});}
 });

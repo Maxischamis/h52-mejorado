@@ -1,10 +1,19 @@
 (function () {
   const base = (window.H52_BACKEND?.apiUrl || '').replace(/\/$/, '');
   async function request(path, options = {}) {
-    const response = await fetch(base + '/api' + path, {credentials: 'include', ...options, headers: {'Content-Type': 'application/json'}});
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let response;
+    try {response = await fetch(base + '/api' + path, {credentials: 'include', ...options, signal: controller.signal, headers: {'Content-Type': 'application/json'}});}
+    catch (error) {throw new Error(error.name === 'AbortError' ? 'El servidor tarda en responder. Podes reintentar sin duplicar el pedido.' : 'No se pudo conectar. Revisa la conexion e intenta nuevamente.');}
+    finally {clearTimeout(timeout);}
     let data;
     try {data = await response.json();} catch {throw new Error('Falta conectar el servidor de pedidos JSON.');}
-    if (!response.ok) throw new Error(data.error || 'No se pudo conectar al servidor.');
+    if (!response.ok) {
+      const error = new Error(data.error || 'No se pudo conectar al servidor.');
+      error.status = response.status;
+      throw error;
+    }
     return data;
   }
   window.H52Backend = {
