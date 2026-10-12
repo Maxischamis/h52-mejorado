@@ -26,3 +26,6 @@
 .extra-options { border:0; padding:0; margin:0 0 24px; }.extra-options legend { font-size:13px; margin-bottom:12px; }
 .extra-options label { display:flex; gap:10px; align-items:center; border-bottom:1px solid var(--line); padding:12px 0; font-size:12px; }.extra-options input { accent-color:var(--red); }.extra-options strong { margin-left:auto; white-space:nowrap; font-size:11px; font-weight:400; color:var(--secondary); }
 @media(max-width:700px) { .single-page #carta { padding-top:10px; }.single-page .categories { margin-inline:-6.8%; padding-inline:6.8%; margin-bottom:28px; }.single-page .categories small { display:none; }.single-page .group-heading h2 { font-size:30px; }.single-page .group-items .product h3 { font-size:21px; }.single-page .group-items .product-description { font-size:12px; }.single-page .group-items .product-image { aspect-ratio:1; } }
+.product-bottom .price {font-size:21px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.detail-price strong {font-size:28px}
+@media(max-width:600px) {.product-bottom .price {font-size:19px}}
