@@ -1,10 +1,12 @@
 # Diseño y Carta
 
-Web independiente, sin Base44 ni cuentas. Contiene los 177 productos importados en 13 categorías, con precios y extras. Inicio y Carta están en una sola página; favoritos es un filtro. Las fotos ilustrativas actuales están guardadas localmente y funcionan sin conexión. No son fotos reales del negocio ni de sus envases comerciales. El pedido es una demostración y no se envía a una cocina.
+Web independiente, sin Base44 ni cuentas. Contiene los 177 productos importados en 13 categorías, con precios y extras. Inicio y Carta están en una sola página; favoritos es un filtro. Las fotos ilustrativas actuales están guardadas localmente y funcionan sin conexión. No son fotos reales del negocio ni de sus envases comerciales. El pedido puede conectarse a Supabase para que lo reciban mozos y cocina en tiempo real; sin esa configuración queda en modo local de prueba.
 
 ## Abrir
 
 - `index.html`: abre la copia local, incluso sin conexión.
+- `mozo.html`: pantalla responsive para que los mozos reciban pedidos, revisen mesa/productos/cantidades/observaciones y los envíen a cocina.
+- `cocina.html`: pantalla responsive para que cocina reciba sólo los pedidos enviados y marque preparación/listo.
 - `editor.html`: editor visual de marca, colores y productos con vista previa. También permite editar, importar y descargar los dos JSON.
 - `Abrir.command`: en Mac, abre la web con un servidor local. Usa Node.js y Python 3, disponibles en esta máquina. Lee los dos JSON cada vez que se recarga la página.
 
@@ -57,6 +59,23 @@ Las imágenes están en dos archivos compartidos dentro de `assets/`; cada produ
 La vista previa cambia en vivo. Para conservar los cambios, descargar `design.json` y `products.json` y reemplazar sus correspondientes archivos dentro de `config/`. El editor no modifica archivos del disco sin tu intervención. Para apertura directa del HTML, actualizar también la copia sin servidor como se explica arriba.
 
 Al publicar, subir la carpeta completa a un hosting estático: la web consumirá directamente los dos JSON. No requiere compilación, paquetes ni Base44.
+
+## Pedidos En Tiempo Real
+
+GitHub Pages sólo publica archivos estáticos: no guarda pedidos, no autentica mozos y no empuja cambios en vivo por sí solo. Para producción, crear un proyecto en Supabase y ejecutar el archivo `supabase-h52.sql` en el SQL Editor. Ese SQL crea la tabla `h52_orders`, activa RLS, permite que clientes creen pedidos nuevos, exige usuarios autenticados para que mozos/cocina vean o cambien estados, agrega índices y habilita Realtime.
+
+Después, copiar `config/backend.example.js` sobre `config/backend.js` y completar:
+
+```js
+window.H52_BACKEND = {
+  supabaseUrl: "https://TU-PROYECTO.supabase.co",
+  supabasePublishableKey: "TU_PUBLISHABLE_KEY",
+  restaurantId: "h52",
+  enabled: true
+};
+```
+
+Crear usuarios del equipo en Supabase Auth para quienes usen `mozo.html` y `cocina.html`. No poner claves `service_role` ni claves secretas en estos archivos porque se publican en el navegador. El identificador `client_order_id` evita duplicados cuando un cliente reintenta enviar el mismo pedido. En Supabase, revisar que la tabla `h52_orders` esté incluida en la publicación `supabase_realtime`; el SQL lo intenta hacer automáticamente.
 
 Foto de portada creada con ImageGen: Negroni en cristal tallado, naranja y romero sobre barra oscura, vaso a la derecha y espacio libre a la izquierda, fotografía editorial sin texto.
 # Refinamiento de la app
