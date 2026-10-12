@@ -21,6 +21,11 @@ function field(label,path,value,type='text',target='design') {
     return `<label class="field">${label}<select ${attrs}>${[...new Set(fonts)].map(font=>`<option value="${escapeHTML(font)}" ${font===value?'selected':''}>${escapeHTML(font)}</option>`).join('')}</select></label>`;
   }
   if(type==='textarea')return `<label class="field">${label}<textarea ${attrs} rows="3">${escapeHTML(value)}</textarea></label>`;
+  if(target==='category'&&path==='icon') {
+    const icons={utensils:'Cubiertos',beef:'Carnes',sandwich:'Sandwiches',pizza:'Pizza',salad:'Ensaladas',beer:'Cerveza',wine:'Vinos','cup-soda':'Bebidas','cake-slice':'Postres',shirt:'Indumentaria'};
+    if(!icons[value])icons[value]=value;
+    return `<label class="field">Icono<select ${attrs}>${Object.entries(icons).map(([id,name])=>`<option value="${escapeHTML(id)}" ${id===value?'selected':''}>${escapeHTML(name)}</option>`).join('')}</select></label>`;
+  }
   if(type==='checkbox')return `<label class="field checkbox"><input type="checkbox" ${attrs} ${value?'checked':''}>${label}</label>`;
   return `<label class="field">${label}<input type="${type}" ${attrs} value="${escapeHTML(value)}"></label>`;
 }
@@ -87,6 +92,7 @@ document.addEventListener('input',event=> {
   const target=input.dataset.target==='product'?selected():input.dataset.target==='category'?data.catalog.categories.find(c=>c.id===selectedCategoryId):data.design;
   if(input.dataset.target==='product'&&path.startsWith('customization.'))target.customization??={removable:[],allowNote:true};
   setPath(target,path,value);
+  if(input.dataset.target==='category'&&path==='name')data.catalog.products.filter(p=>p.classification.categoryId===target.id).forEach(p=>{p.category=value;});
   if(input.dataset.target==='product'&&path==='image'){delete target.imageCrop;delete target.imageIllustrative;}
   if(/^homeSections\.\d+\.categoryId$/.test(path))delete data.design.homeSections[Number(path.split('.')[1])].productIds;
   if(path.startsWith('theme.'))document.querySelectorAll(`[data-path="${path}"]`).forEach(el=>{if(el!==input&&/^#[\da-f]{6}$/i.test(value))el.value=value;});
@@ -99,7 +105,7 @@ document.addEventListener('click',event=> {
   if(button.dataset.width){$('#preview').classList.toggle('mobile',button.dataset.width==='mobile');$('#preview').classList.toggle('tablet',button.dataset.width==='tablet');document.querySelectorAll('[data-width]').forEach(b=>b.classList.toggle('active',b===button));}
   if(button.dataset.palette!==undefined){palettes[Number(button.dataset.palette)].colors.forEach((color,i)=>data.design.theme[H52Data.colorFields[i]]=color);renderDesign();update();}
   if(['undo','redo'].includes(button.id)){const next=historyIndex+(button.id==='undo'?-1:1);if(next>=0&&next<history.length){historyIndex=next;data=JSON.parse(history[next]);selectedId=data.catalog.products.some(p=>p.id===selectedId)?selectedId:data.catalog.products[0]?.id;renderDesign();renderCategories();renderProducts();update(false);}}
-  if(button.id==='new-category'){const id='categoria-'+Date.now();data.catalog.categories.push({id,name:'Nueva categoría',subtitle:'',icon:'utensils',order:data.catalog.categories.length+1});selectedCategoryId=id;renderCategories();renderProducts();update();}
+  if(button.id==='new-category')openCategoryDialog('create');
   if(button.id==='duplicate-product'&&selected()){const p=structuredClone(selected());p.id='producto-'+Date.now();p.name+=' (copia)';p.order=data.catalog.products.length+1;data.catalog.products.push(p);selectedId=p.id;renderProducts();update();}
   if(button.id==='download-design')download('design.json',JSON.stringify(data.design,null,2));
   if(button.id==='download-products')download('products.json',JSON.stringify(data.catalog,null,2));

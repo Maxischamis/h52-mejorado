@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Editor de diseño y carta</title>
     <link rel="stylesheet" href="editor.css">
-    <link rel="stylesheet" href="editor-studio.css?v=5">
+    <link rel="stylesheet" href="editor-studio.css?v=6">
     <script defer src="assets/lucide.min.js"></script>
     <script defer src="assets/offline-data.js"></script>
     <script defer src="config-utils.js"></script>
@@ -15,9 +15,10 @@
     <script defer src="config/github.js"></script>
     <script defer src="editor-github.js"></script>
     <script defer src="editor-sync.js?v=3"></script>
-    <script defer src="editor-tools.js?v=5"></script>
+    <script defer src="editor-tools.js?v=6"></script>
+    <script defer src="editor-categories.js?v=6"></script>
     <script defer src="editor-create.js?v=5"></script>
-    <script defer src="editor.js?v=5"></script>
+    <script defer src="editor.js?v=6"></script>
 </head>
 
 <body data-role="waiter">
@@ -82,14 +83,14 @@
                 <div class="catalog-caption"><span id="editor-count"></span><button id="select-results" title="Seleccionar resultados" aria-label="Seleccionar resultados"><i data-lucide="list-checks"></i></button><button id="clear-selection" title="Limpiar seleccion" aria-label="Limpiar seleccion"><i data-lucide="list-x"></i></button></div>
                 <div id="editor-catalog" class="editor-catalog"></div>
                 <div id="bulk-tools" class="bulk-tools" hidden><strong id="bulk-count"></strong><select id="bulk-action" aria-label="Accion para seleccion"><option value="percent">Cambiar precio %</option><option value="amount">Sumar al precio</option><option value="available">Marcar disponible</option><option value="unavailable">Marcar no disponible</option><option value="featured">Destacar</option><option value="unfeatured">Quitar destacado</option></select><input id="bulk-value" type="number" value="10" step="any" aria-label="Ajuste de precio"><button id="bulk-apply">Aplicar</button></div>
-                <details>
+                <details open>
                     <summary>Categorías</summary>
                     <div class="product-tools"><select id="category-select"
                             aria-label="Seleccionar categoría"></select><button id="new-category"
-                            title="Nueva categoría" aria-label="Nueva categoría"><i data-lucide="plus"></i></button>
+                            title="Nueva categoría" aria-label="Nueva categoría"><i data-lucide="plus"></i>Nueva</button>
                     </div>
                     <div id="category-fields"></div>
-                    <div class="category-actions"><button id="category-up" title="Subir categoria" aria-label="Subir categoria"><i data-lucide="arrow-up"></i></button><button id="category-down" title="Bajar categoria" aria-label="Bajar categoria"><i data-lucide="arrow-down"></i></button><button id="delete-category" title="Eliminar categoria vacia" aria-label="Eliminar categoria vacia"><i data-lucide="trash-2"></i></button></div>
+                    <div class="category-actions"><button id="category-up" title="Subir categoria" aria-label="Subir categoria"><i data-lucide="arrow-up"></i></button><button id="category-down" title="Bajar categoria" aria-label="Bajar categoria"><i data-lucide="arrow-down"></i></button><button id="delete-category" title="Eliminar categoria" aria-label="Eliminar categoria"><i data-lucide="trash-2"></i></button></div>
                 </details>
                 <div class="product-tools"><select id="product-select"
                         aria-label="Seleccionar producto"></select><button id="duplicate-product"
@@ -146,6 +147,7 @@
         </form>
     </dialog>
     <dialog id="image-dialog" aria-labelledby="image-dialog-title"><div class="dialog-heading"><h2 id="image-dialog-title">Fotos de la carta</h2><button data-close-images title="Cerrar" aria-label="Cerrar fotos"><i data-lucide="x"></i></button></div><input id="image-search" type="search" placeholder="Buscar foto" aria-label="Buscar foto"><div id="image-gallery" class="image-gallery"></div></dialog>
+    <dialog id="category-dialog" aria-labelledby="category-dialog-title"><form id="category-dialog-form"><div class="dialog-heading"><h2 id="category-dialog-title">Nueva categoria</h2><button type="button" data-close-category aria-label="Cerrar categorias" title="Cerrar"><i data-lucide="x"></i></button></div><div id="category-create-fields"><label class="field">Nombre<input id="category-new-name" maxlength="150" autocomplete="off"></label><label class="field">Subtitulo<input id="category-new-subtitle" maxlength="300"></label><label class="field">Icono<select id="category-new-icon"><option value="utensils">Cubiertos</option><option value="beef">Carnes</option><option value="sandwich">Sandwiches</option><option value="pizza">Pizza</option><option value="salad">Ensaladas</option><option value="beer">Cerveza</option><option value="wine">Vinos</option><option value="cup-soda">Bebidas</option><option value="cake-slice">Postres</option><option value="shirt">Indumentaria</option></select></label></div><div id="category-delete-fields" hidden><p id="category-delete-summary"></p><label class="field">Mover productos y secciones a<select id="category-destination"></select></label></div><p id="category-dialog-error" role="alert"></p><div class="create-actions"><button type="button" data-close-category>Cancelar</button><button type="submit" id="category-dialog-confirm">Crear categoria</button></div></form></dialog>
 </body>
 
 </html>

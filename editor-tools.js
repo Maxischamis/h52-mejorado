@@ -127,9 +127,7 @@ document.addEventListener('click',event => {
     if(to>=0&&to<list.length){[list[index],list[to]]=[list[to],list[index]];list.forEach((c,i)=>c.order=i+1);data.catalog.categories=list;renderCategories();renderProducts();update();}
   }
   if(button.id==='delete-category') {
-    if(data.catalog.products.some(p=>p.classification.categoryId===selectedCategoryId)||data.design.homeSections.some(s=>s.categoryId===selectedCategoryId)){status('La categoria tiene productos o secciones. Cambia su categoria antes de eliminarla.',true);return;}
-    if(!confirm('Eliminar esta categoria vacia?'))return;
-    data.catalog.categories=data.catalog.categories.filter(c=>c.id!==selectedCategoryId);renderCategories();renderProducts();update();
+    openCategoryDialog('delete');
   }
   if (button.id==='choose-image') {renderImageGallery();$('#image-dialog').showModal();}
   if (button.hasAttribute('data-close-images')) $('#image-dialog').close();

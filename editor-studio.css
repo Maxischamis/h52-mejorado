@@ -140,6 +140,10 @@ main {grid-template-columns:minmax(420px,520px) minmax(0,1fr)}
 .catalog-filters .field {margin:0}.catalog-filters select {min-height:42px}
 #create-product-dialog {width:min(640px,calc(100vw - 24px));max-height:90dvh;border:1px solid #ced6dc;border-radius:8px;padding:24px;color:#202625}
 #create-product-dialog::backdrop {background:#20262599}
+#category-dialog {width:min(480px,calc(100vw - 32px));max-height:90dvh;box-sizing:border-box;border:1px solid #ced6dc;border-radius:8px;padding:24px;color:#202625}
+#category-dialog::backdrop {background:#20262599}
+#category-dialog-error {color:#a02b37}
+#category-delete-summary {line-height:1.5}
 .create-basics {display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:0 14px}.create-description {grid-column:1/-1}
 .create-switches {display:flex;gap:24px;flex-wrap:wrap}
 #create-product-body details {border-top:1px solid #dce2e6;padding-bottom:8px}#create-product-body summary {padding:16px 0;font-size:14px;font-weight:600;cursor:pointer}
