@@ -136,4 +136,16 @@ main {grid-template-columns:minmax(420px,520px) minmax(0,1fr)}
 @media(max-width:360px) {.editor-heading {display:none}.editor-panel {padding-inline:12px}.editor-tabs {margin-inline:-12px;padding-inline:6px}.editor-tabs button {font-size:12px}.bulk-tools {grid-template-columns:minmax(0,1fr) 65px auto}}
 .range-field>span {display:flex;align-items:center;gap:16px}.range-field input[type=range] {padding:0;accent-color:#b7223b;flex:1}.range-field output {min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
 #github-token-link {font-size:12px;color:#a91f36;text-underline-offset:3px}#shared-disconnect {width:40px;padding:0}
+.catalog-heading {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.catalog-heading h2 {margin:0;padding:0;border:0;font-size:18px}.catalog-heading button {background:#253039;color:#fff;border-color:#253039;min-height:42px}
+.catalog-filters .field {margin:0}.catalog-filters select {min-height:42px}
+#create-product-dialog {width:min(640px,calc(100vw - 24px));max-height:90dvh;border:1px solid #ced6dc;border-radius:8px;padding:24px;color:#202625}
+#create-product-dialog::backdrop {background:#20262599}
+.create-basics {display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:0 14px}.create-description {grid-column:1/-1}
+.create-switches {display:flex;gap:24px;flex-wrap:wrap}
+#create-product-body details {border-top:1px solid #dce2e6;padding-bottom:8px}#create-product-body summary {padding:16px 0;font-size:14px;font-weight:600;cursor:pointer}
+.create-actions {display:flex;justify-content:end;gap:10px;position:sticky;bottom:-24px;background:#fff;padding:16px 0 8px;border-top:1px solid #dce2e6}
+#create-confirm {background:#b7223b;color:#fff;border-color:#b7223b}
+#create-error {color:#a91f36;font-size:13px;min-height:18px}
+#create-photo-preview .editor-photo {width:112px;height:112px;margin-bottom:12px}
+@media(max-width:600px) {#create-product-dialog {padding:18px}.create-basics {grid-template-columns:1fr}.create-actions {bottom:-18px}.create-actions button {flex:1;min-height:44px}}
 @media(max-width:850px) {.field input,.field textarea,.field select,.catalog-search input,#image-search {font-size:16px}}

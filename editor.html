@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Editor de diseño y carta</title>
     <link rel="stylesheet" href="editor.css">
-    <link rel="stylesheet" href="editor-studio.css?v=2">
+    <link rel="stylesheet" href="editor-studio.css?v=5">
     <script defer src="assets/lucide.min.js"></script>
     <script defer src="assets/offline-data.js"></script>
     <script defer src="config-utils.js"></script>
@@ -15,8 +15,9 @@
     <script defer src="config/github.js"></script>
     <script defer src="editor-github.js"></script>
     <script defer src="editor-sync.js?v=3"></script>
-    <script defer src="editor-tools.js?v=2"></script>
-    <script defer src="editor.js?v=2"></script>
+    <script defer src="editor-tools.js?v=5"></script>
+    <script defer src="editor-create.js?v=5"></script>
+    <script defer src="editor.js?v=5"></script>
 </head>
 
 <body data-role="waiter">
@@ -75,8 +76,9 @@
                 </details>
             </div>
             <div id="products-tab" class="editor-view">
+                <div class="catalog-heading"><h2>Productos</h2><button id="new-product"><i data-lucide="plus"></i>Nuevo producto</button></div>
                 <div class="catalog-search"><i data-lucide="search"></i><input id="editor-search" type="search" placeholder="Buscar producto" aria-label="Buscar producto"></div>
-                <div class="catalog-filters"><select id="editor-category" aria-label="Filtrar categoria"></select><select id="editor-availability" aria-label="Filtrar disponibilidad"><option value="all">Todos</option><option value="available">Disponibles</option><option value="unavailable">No disponibles</option><option value="featured">Destacados</option></select></div>
+                <div class="catalog-filters"><label class="field">Categoria<select id="editor-category" aria-label="Filtrar categoria"></select></label><label class="field">Disponibilidad<select id="editor-availability" aria-label="Filtrar disponibilidad"><option value="all">Todos</option><option value="available">Disponibles</option><option value="unavailable">No disponibles</option><option value="featured">Destacados</option></select></label></div>
                 <div class="catalog-caption"><span id="editor-count"></span><button id="select-results" title="Seleccionar resultados" aria-label="Seleccionar resultados"><i data-lucide="list-checks"></i></button><button id="clear-selection" title="Limpiar seleccion" aria-label="Limpiar seleccion"><i data-lucide="list-x"></i></button></div>
                 <div id="editor-catalog" class="editor-catalog"></div>
                 <div id="bulk-tools" class="bulk-tools" hidden><strong id="bulk-count"></strong><select id="bulk-action" aria-label="Accion para seleccion"><option value="percent">Cambiar precio %</option><option value="amount">Sumar al precio</option><option value="available">Marcar disponible</option><option value="unavailable">Marcar no disponible</option><option value="featured">Destacar</option><option value="unfeatured">Quitar destacado</option></select><input id="bulk-value" type="number" value="10" step="any" aria-label="Ajuste de precio"><button id="bulk-apply">Aplicar</button></div>
@@ -90,8 +92,7 @@
                     <div class="category-actions"><button id="category-up" title="Subir categoria" aria-label="Subir categoria"><i data-lucide="arrow-up"></i></button><button id="category-down" title="Bajar categoria" aria-label="Bajar categoria"><i data-lucide="arrow-down"></i></button><button id="delete-category" title="Eliminar categoria vacia" aria-label="Eliminar categoria vacia"><i data-lucide="trash-2"></i></button></div>
                 </details>
                 <div class="product-tools"><select id="product-select"
-                        aria-label="Seleccionar producto"></select><button id="new-product" title="Nuevo producto"
-                        aria-label="Nuevo producto"><i data-lucide="plus"></i></button><button id="duplicate-product"
+                        aria-label="Seleccionar producto"></select><button id="duplicate-product"
                         title="Duplicar producto" aria-label="Duplicar producto"><i
                             data-lucide="copy"></i></button><button id="delete-product" title="Eliminar producto"
                         aria-label="Eliminar producto"><i data-lucide="trash-2"></i></button></div>
@@ -128,6 +129,22 @@
         </section>
     </main>
     <button id="toggle-preview" class="preview-toggle"><i data-lucide="eye"></i>Vista previa</button>
+    <dialog id="create-product-dialog" aria-labelledby="create-product-title">
+        <form id="create-product-form">
+            <div class="dialog-heading"><h2 id="create-product-title">Nuevo producto</h2><button type="button" data-close-create title="Cerrar" aria-label="Cerrar nuevo producto"><i data-lucide="x"></i></button></div>
+            <label class="field">Categoria<select id="create-category" required><option value="">Elegir categoria</option></select></label>
+            <div id="create-product-body" hidden>
+                <div class="create-basics"><label class="field create-name">Nombre<input id="create-name" required maxlength="150" autocomplete="off"></label><label class="field">Precio<input id="create-price" type="number" min="0" step="0.01" required inputmode="decimal"></label><label class="field create-description">Descripcion<textarea id="create-description" rows="3" maxlength="2000"></textarea></label></div>
+                <div class="create-switches"><label class="field checkbox"><input id="create-available" type="checkbox" checked>Disponible</label><label class="field checkbox"><input id="create-featured" type="checkbox">Destacado</label></div>
+                <details><summary>Foto</summary><label class="field">Foto existente<select id="create-photo"></select></label><label class="field">Direccion de foto propia<input id="create-image" type="text" placeholder="https://..." maxlength="2000"></label><div id="create-photo-preview"></div></details>
+                <details><summary>Ingredientes y alergenos</summary><label class="field">Ingredientes, separados por coma<textarea id="create-ingredients" rows="2"></textarea></label><label class="field">Alergenos, separados por coma<input id="create-allergens"></label><label class="field">Porcion<input id="create-serving"></label><label class="field">Preparacion en minutos<input id="create-preparation" type="number" min="0" step="1"></label></details>
+                <details><summary>Opciones y extras</summary><label class="field">Opciones para quitar, una por linea<textarea id="create-removable" rows="3"></textarea></label><label class="field checkbox"><input id="create-allow-note" type="checkbox" checked>Permitir observaciones del cliente</label><div id="create-extras"></div><button type="button" id="create-add-extra"><i data-lucide="plus"></i>Agregar extra</button></details>
+                <details><summary>Clasificacion adicional</summary><label class="field">Subcategoria<input id="create-subcategory"></label><label class="field">Etiquetas, separadas por coma<input id="create-tags"></label><label class="field">Preferencias alimentarias, separadas por coma<input id="create-dietary"></label><label class="field">Insignia<input id="create-badge"></label><label class="field">Alcohol (%)<input id="create-alcohol" type="number" min="0" max="100" step="0.1"></label></details>
+            </div>
+            <p id="create-error" role="alert"></p>
+            <div class="create-actions"><button type="button" data-close-create>Cancelar</button><button id="create-confirm" type="submit" disabled><i data-lucide="check"></i>Crear producto</button></div>
+        </form>
+    </dialog>
     <dialog id="image-dialog" aria-labelledby="image-dialog-title"><div class="dialog-heading"><h2 id="image-dialog-title">Fotos de la carta</h2><button data-close-images title="Cerrar" aria-label="Cerrar fotos"><i data-lucide="x"></i></button></div><input id="image-search" type="search" placeholder="Buscar foto" aria-label="Buscar foto"><div id="image-gallery" class="image-gallery"></div></dialog>
 </body>
 

@@ -43,7 +43,11 @@ function renderCategories(){
 }
 function selected(){return data.catalog.products.find(p=>p.id===selectedId);}
 function renderProducts() {
-  $('#product-select').innerHTML=data.catalog.products.map(p=>`<option value="${escapeHTML(p.id)}" ${p.id===selectedId?'selected':''}>${escapeHTML(p.name)}</option>`).join('');
+  const categoryFilter=$('#editor-category').value;
+  const options=data.catalog.products.filter(p=>!categoryFilter||p.classification.categoryId===categoryFilter);
+  if(!options.some(p=>p.id===selectedId))selectedId=options[0]?.id;
+  $('#product-select').innerHTML=options.map(p=>`<option value="${escapeHTML(p.id)}" ${p.id===selectedId?'selected':''}>${escapeHTML(p.name)}</option>`).join('');
+  $('#duplicate-product').disabled=!selectedId;$('#delete-product').disabled=!selectedId;
   const p=selected();if(!p){$('#product-fields').innerHTML='';return;}
   $('#product-fields').innerHTML=field('Nombre','name',p.name,'text','product')+field('Descripción','description',p.description,'textarea','product')+field('Precio','price',p.price,'number','product')+`<label class="field">Categoría<select data-target="product" data-path="classification.categoryId">${data.catalog.categories.map(c=>`<option value="${escapeHTML(c.id)}" ${c.id===p.classification.categoryId?'selected':''}>${escapeHTML(c.name)}</option>`).join('')}</select></label>`+field('Subcategoría','classification.subcategory',p.classification.subcategory,'text','product')+field('Etiquetas (separadas por coma)','classification.tags',p.classification.tags.join(', '),'text','product')+field('Clasificación alimentaria (separada por coma)','classification.dietary',p.classification.dietary.join(', '),'text','product')+field('Imagen','image',p.image,'text','product')+field('Descripción de imagen','imageAlt',p.imageAlt,'text','product')+field('Insignia','badge',p.badge,'text','product')+field('Ingredientes (separados por coma)','ingredients',p.ingredients.join(', '),'textarea','product')+field('Alérgenos (vacío = sin información)','allergens',p.allergens?.join(', ')||'','text','product')+field('Porción','serving',p.serving||'','text','product')+field('Preparación en minutos (opcional)','preparationMinutes',p.preparationMinutes??'','number','product')+field('Alcohol % (opcional)','alcoholPercent',p.alcoholPercent??'','number','product')+field('Orden','order',p.order,'number','product')+field('Disponible','available',p.available,'checkbox','product')+field('Destacado','featured',p.featured,'checkbox','product');
   renderCustomizationFields();
@@ -104,8 +108,7 @@ document.addEventListener('click',event=> {
   if(button.id==='download-offline')download('offline-data.js',`window.H52_OFFLINE_DATA = ${JSON.stringify(data)};`,'text/javascript');
   if(button.id==='apply-json'){try{const next=H52Data.validate(JSON.parse($('#raw-design').value),JSON.parse($('#raw-products').value));data=next;selectedId=data.catalog.products[0]?.id;renderDesign();renderCategories();renderProducts();update();}catch(error){status(error.message,true);}}
   if(button.id==='new-product'){
-    if(!data.catalog.categories.length){status('Agregá una categoría en el JSON primero.',true);return;}
-    const id='producto-'+Date.now();data.catalog.products.push({id,name:'Nuevo producto',description:'',price:0,image:'',imageAlt:'',classification:{categoryId:data.catalog.categories[0].id,subcategory:'',tags:[],dietary:[]},available:true,featured:false,badge:'',order:data.catalog.products.length+1,ingredients:[],allergens:null,serving:null,preparationMinutes:null,alcoholPercent:null});selectedId=id;renderProducts();update();
+    openCreateProduct();
   }
   if(button.id==='delete-product'){
     if(!selected()||!confirm(`Eliminar ${selected().name}? Puedes recuperarlo con Deshacer.`))return;

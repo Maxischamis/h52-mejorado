@@ -86,7 +86,11 @@ function renderImageGallery() {
   $('#image-gallery').innerHTML = photoLibrary.filter(p => editorText(p.name).includes(query)).map(p => `<button data-pick-image="${escapeHTML(p.id)}">${editorPhoto(p)}<span>${escapeHTML(p.name)}</span></button>`).join('');
 }
 document.addEventListener('input',event => {
-  if (['editor-search','editor-category','editor-availability'].includes(event.target.id)) renderEditorCatalog();
+  if (['editor-search','editor-availability'].includes(event.target.id)) renderEditorCatalog();
+  if(event.target.id==='editor-category') {
+    renderEditorCatalog();const first=editorResults()[0];
+    selectedId=first?.id;renderProducts();
+  }
   if (event.target.id === 'image-search') renderImageGallery();
   if (event.target.id === 'bulk-action') $('#bulk-value').hidden = !['percent','amount'].includes(event.target.value);
 });
