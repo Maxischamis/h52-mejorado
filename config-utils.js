@@ -46,6 +46,9 @@
   }
   async function load() {
     if (location.protocol === 'file:') return validate(window.H52_OFFLINE_DATA.design,window.H52_OFFLINE_DATA.catalog);
+    if (window.H52Backend?.configured) {
+      try {const shared=await window.H52Backend.getMenu();return validate(shared.design,shared.catalog);} catch {}
+    }
     const results = await Promise.all(['config/design.json','config/products.json'].map(async url => {
       const response = await fetch(url,{cache:'no-store'});
       if (!response.ok) throw new Error(`No se pudo leer ${url}.`);

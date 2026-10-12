@@ -10,10 +10,13 @@
     <script defer src="assets/lucide.min.js"></script>
     <script defer src="assets/offline-data.js"></script>
     <script defer src="config-utils.js"></script>
+    <script defer src="config/backend.js"></script>
+    <script defer src="h52-backend.js"></script>
+    <script defer src="editor-sync.js"></script>
     <script defer src="editor.js"></script>
 </head>
 
-<body>
+<body data-role="waiter">
     <header><a href="index.html" title="Volver a la web" aria-label="Volver a la web"><i
                 data-lucide="arrow-left"></i></a>
         <h1>Diseño & carta</h1>
@@ -28,6 +31,12 @@
             <nav class="editor-tabs"><button data-tab="design" class="active">Diseño</button><button
                     data-tab="products">Productos</button><button data-tab="json">JSON</button></nav>
             <p id="editor-status" role="status">Cargando…</p>
+            <div class="shared-tools">
+                <p id="shared-status" role="status">Conectando guardado compartido...</p>
+                <form id="shared-login" hidden><label>Clave de salon<input id="shared-password" type="password" autocomplete="current-password" required></label><button type="submit">Ingresar</button></form>
+                <button id="shared-save" disabled><i data-lucide="save"></i>Guardar compartido</button>
+                <button id="shared-reload" disabled><i data-lucide="refresh-cw"></i>Recargar compartido</button>
+            </div>
             <div id="draft-tools" hidden><span>Borrador disponible</span><button id="restore-draft">Recuperar</button>
             </div>
             <div id="design-tab" class="editor-view">

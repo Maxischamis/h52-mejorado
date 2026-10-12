@@ -206,3 +206,14 @@ window.addEventListener('message',event=> {
   try {applyConfig(event.data.payload,true);window.parent.postMessage({type:'h52-preview-success'},'*');} catch(error){window.parent.postMessage({type:'h52-preview-error',message:error.message},'*');}
 });
 H52Data.load().then(data=>{applyConfig(data);if(window.parent!==window)window.parent.postMessage({type:'h52-ready'},'*');}).catch(error=>{$('#load-error').hidden=false;$('#load-error').textContent=error.message;console.error(error);});
+if (window.parent === window && window.H52Backend?.configured) {
+  let checkingMenu = false;
+  setInterval(async () => {
+    if (!design || checkingMenu || document.hidden || submittingOrder || $('#details').open || $('#confirmation').open) return;
+    checkingMenu = true;
+    try {
+      const next = await H52Backend.getMenu();
+      if (JSON.stringify({design:next.design,catalog:next.catalog}) !== JSON.stringify({design,catalog})) applyConfig(next,true);
+    } catch {} finally {checkingMenu = false;}
+  }, 2000);
+}

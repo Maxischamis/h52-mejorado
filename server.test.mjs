@@ -62,11 +62,30 @@ test('JSON: autenticacion, roles, duplicados concurrentes, precios y persistenci
     const extraOrder = request('/orders', 'POST', {...input, clientOrderId: 'another-id'});
     assert.ok(new TextDecoder().decode((await reader.read()).value).includes('data:'));
     await extraOrder;
+    const menu = (await request('/menu')).data;
+    const changed = structuredClone(menu); changed.design.brand.subtitle = 'Compartido entre celulares';
+    const menuPatch = {...changed, expectedRevision: menu.revision};
+    assert.equal((await request('/menu', 'PATCH', menuPatch)).status, 401);
+    assert.equal((await request('/menu', 'PATCH', menuPatch, kitchen.cookie)).status, 403);
+    const menuEdits = await Promise.all([
+      request('/menu', 'PATCH', menuPatch, waiter.cookie),
+      request('/menu', 'PATCH', menuPatch, waiter.cookie)
+    ]);
+    assert.deepEqual(menuEdits.map(r => r.status).sort(), [200,409]);
+    const shared = (await request('/menu')).data;
+    assert.equal(shared.design.brand.subtitle, 'Compartido entre celulares');
+    const invalid = structuredClone(shared); invalid.catalog.products[0].price = -1;
+    assert.equal((await request('/menu', 'PATCH', {...invalid, expectedRevision: shared.revision}, waiter.cookie)).status, 400);
+    assert.equal((await request('/menu')).data.revision, shared.revision);
+    assert.equal(JSON.parse(await readFile(join(dir, 'menu.previous.json'), 'utf8')).design.brand.subtitle, menu.design.brand.subtitle);
+    assert.equal((await (await fetch('http://127.0.0.1:18987/config/design.json')).json()).brand.subtitle, 'Compartido entre celulares');
+    await reader.read();
     await request('/logout', 'POST', null, waiter.cookie);
     assert.equal((await reader.read()).done, true);
     assert.equal((await fetch('http://127.0.0.1:18987/private-data/orders.json')).status, 404);
     await stop(); await start();
     const login = await request('/login', 'POST', {role: 'waiter', password: 'test-waiter'});
     assert.equal((await request('/orders', 'GET', null, login.cookie)).data.find(o=>o.id===rows[0].id).status, 'delivered');
+    assert.equal((await request('/menu')).data.design.brand.subtitle, 'Compartido entre celulares');
   } finally {if (child && child.exitCode === null) await stop(); await rm(dir, {recursive: true, force: true});}
 });

@@ -29,6 +29,8 @@
       return result;
     },
     listOrders: () => request('/orders'),
+    getMenu: () => request('/menu'),
+    saveMenu: (payload) => request('/menu', {method: 'PATCH', body: JSON.stringify(payload)}),
     updateOrder: (id, patch) => request('/orders/' + encodeURIComponent(id), {method: 'PATCH', body: JSON.stringify(patch)}),
     signIn: (email, password) => request('/login', {method: 'POST', body: JSON.stringify({password, role: document.body.dataset.role})}),
     signOut: () => request('/logout', {method: 'POST'}),

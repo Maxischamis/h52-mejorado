@@ -3,7 +3,8 @@ import {readFile, mkdir, rename, open, unlink} from 'node:fs/promises';
 import {unlinkSync} from 'node:fs';
 import {resolve, extname, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {randomUUID, randomBytes, timingSafeEqual} from 'node:crypto';
+import {randomUUID, randomBytes, timingSafeEqual, createHash} from 'node:crypto';
+import vm from 'node:vm';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dataDir = resolve(process.env.H52_DATA_DIR || resolve(root, 'private-data'));
@@ -27,6 +28,20 @@ try {
   await handle.writeFile(String(process.pid)); await handle.close();
 }
 process.on('exit', () => {try {unlinkSync(lockfile);} catch {}});
+const validator = {window: {}, Intl};
+vm.runInNewContext(await readFile(resolve(root, 'config-utils.js'), 'utf8'), validator);
+const menuFile = resolve(dataDir, 'menu.json');
+let sharedMenu = null;
+try {
+  const saved = JSON.parse(await readFile(menuFile, 'utf8'));
+  sharedMenu = validator.window.H52Data.validate(saved.design, saved.catalog);
+} catch (error) {if (error.code !== 'ENOENT') throw error;}
+async function readMenu() {
+  const payload = sharedMenu || validator.window.H52Data.validate(
+    JSON.parse(await readFile(resolve(root, 'config/design.json'), 'utf8')),
+    JSON.parse(await readFile(resolve(root, 'config/products.json'), 'utf8')));
+  return {...payload, revision: createHash('sha256').update(JSON.stringify(payload)).digest('hex')};
+}
 async function atomicWrite(target, value) {
   const handle = await open(target + '.tmp', 'w', 0o600);
   try {await handle.writeFile(JSON.stringify(value, null, 2)); await handle.sync();} finally {await handle.close();}
@@ -45,9 +60,9 @@ function session(req) {
   const value = sessions.get(token);
   return value?.expires > Date.now() ? value : null;
 }
-async function body(req) {
+async function body(req, maximum = 65536) {
   let value = '';
-  for await (const chunk of req) {value += chunk; if (Buffer.byteLength(value) > 65536) throw new Error('Pedido demasiado grande.');}
+  for await (const chunk of req) {value += chunk; if (Buffer.byteLength(value) > maximum) throw new Error('Contenido demasiado grande.');}
   return JSON.parse(value || '{}');
 }
 function throttle(req, bucket, maximum) {
@@ -76,6 +91,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     if (req.method === 'OPTIONS') {res.writeHead(204, {'Access-Control-Allow-Methods': 'GET, POST, PATCH', 'Access-Control-Allow-Headers': 'Content-Type'}); return res.end();}
     const user = session(req);
+    if (path === '/api/menu' && req.method === 'GET') return json(res, 200, await readMenu());
     if (path === '/api/session' && req.method === 'GET') return json(res, 200, {session: user ? {role: user.role} : null});
     if (path === '/api/login' && req.method === 'POST') {
       if (!throttle(req, 'login', 10)) return json(res, 429, {error: 'Esperar un minuto antes de intentar nuevamente.'});
@@ -96,8 +112,7 @@ const server = http.createServer(async (req, res) => {
       if (!throttle(req, 'orders', 30)) return json(res, 429, {error: 'Demasiados pedidos. Esperar un minuto.'});
       const input = await body(req);
       if (typeof input.clientOrderId !== 'string' || !input.clientOrderId || input.clientOrderId.length > 100 || !String(input.tableNumber || '').trim() || String(input.tableNumber).length > 30 || !Array.isArray(input.items) || !input.items.length || input.items.length > 60) return json(res, 400, {error: 'Mesa o productos invalidos.'});
-      const catalog = JSON.parse(await readFile(resolve(root, 'config/products.json'), 'utf8'));
-      const design = JSON.parse(await readFile(resolve(root, 'config/design.json'), 'utf8'));
+      const {catalog, design} = await readMenu();
       const items = input.items.map(item => {
         const product = catalog.products.find(p => String(p.id) === String(item.productId));
         if (!product || product.available === false || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > design.order.maxQuantity) throw new Error('Producto o cantidad invalida.');
@@ -123,6 +138,25 @@ const server = http.createServer(async (req, res) => {
     }
     if (path.startsWith('/api/')) {
       if (!user) return json(res, 401, {error: 'Ingresar con la clave del equipo.'});
+      if (path === '/api/menu' && req.method === 'PATCH') {
+        if (user.role !== 'waiter') return json(res, 403, {error: 'Solo salon puede editar la carta.'});
+        const input = await body(req, 2097152);
+        const result = queue.then(async () => {
+          const current = await readMenu();
+          if (input.expectedRevision !== current.revision) {
+            const error = new Error('Otro celular cambio la carta. Tu borrador sigue intacto. Recarga la version compartida antes de guardar.');
+            error.status = 409; throw error;
+          }
+          const next = validator.window.H52Data.validate(input.design, input.catalog);
+          await atomicWrite(resolve(dataDir, 'menu.previous.json'), {design: current.design, catalog: current.catalog});
+          await atomicWrite(menuFile, next);
+          sharedMenu = next;
+          for (const stream of streams) stream.res.write('data: {}\n\n');
+          return readMenu();
+        });
+        queue = result.catch(() => {});
+        return json(res, 200, await result);
+      }
       if (path === '/api/orders' && req.method === 'GET') return json(res, 200, user.role === 'kitchen' ? orders.filter(o => ['sent_to_kitchen', 'preparing', 'ready'].includes(o.status)) : orders);
       if (path === '/api/events' && req.method === 'GET') {
         res.writeHead(200, {'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive'});
@@ -175,6 +209,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 404, {error: 'Ruta inexistente.'});
     }
     const file = path === '/' ? 'index.html' : decodeURIComponent(path).slice(1);
+    if (sharedMenu && ['config/design.json','config/products.json'].includes(file)) return json(res, 200, sharedMenu[file.endsWith('design.json') ? 'design' : 'catalog']);
     if (!(file === 'index.html' || /^(mozo|cocina|editor)\.html$/.test(file) || /^[\w-]+\.(js|css)$/.test(file) || /^(assets|config)\/[\w./-]+\.(js|json|png|jpg|jpeg|webp|svg|woff2|ico)$/.test(file)) || file.includes('..')) return json(res, 404, {error: 'Archivo inexistente.'});
     const content = await readFile(resolve(root, file));
     const types = {'.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg', '.webp':'image/webp'};

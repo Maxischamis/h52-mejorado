@@ -2,6 +2,29 @@
 
 ## Con el editor
 
+### Compartido entre celulares
+
+Abri `editor.html` desde el servidor H52, ingresa con la clave de salon y usa
+**Guardar compartido**. La carta y los editores sin cambios pendientes consultan
+el servidor cada dos segundos; al volver a una pestaña del editor se actualiza tambien.
+Si otro celular guardo mientras estabas editando, tu borrador no se pisa:
+descarga tus JSON y usa **Recargar compartido** para revisar la version nueva.
+
+Sin base de datos: el servidor guarda diseño y catalogo juntos en
+`H52_DATA_DIR/menu.json`, mediante reemplazo atomico. Conserva la version anterior
+en `menu.previous.json`. Estos archivos no se publican en Git ni contienen claves.
+Para editarlos a mano, detene el servidor, edita `menu.json` y reinicialo.
+Una vez que existe ese archivo, es la fuente compartida; `config/` sigue siendo
+la configuracion inicial y la version estatica de GitHub Pages.
+
+Los dos celulares deben abrir la misma direccion del servidor. En el mismo Wi-Fi,
+usa `http://IP-DE-LA-COMPUTADORA:8787/editor.html` y mantenela encendida.
+Para acceso desde cualquier lugar hace falta desplegar Node con HTTPS, disco
+persistente, una sola instancia y las variables documentadas en `LEEME.md`.
+GitHub Pages solo sirve archivos: subir el codigo a Git no instala este servidor.
+
+### Copias locales o GitHub Pages
+
 1. Abrí `Abrir.command` y entrá a `editor.html`.
 2. En Productos, elegí el plato y su categoría.
 3. En Personalización del pedido, escribí una opción por línea: Papas, Cebolla, Salsa.
@@ -50,4 +73,4 @@ siguen disponibles después para refinar la selección.
 
 Las versiones de un plato se guardan por separado: normal, sin papas, sin cebolla,
 etc. Las indicaciones aparecen tanto en el carrito como en el resumen. El pedido
-sigue siendo de demostración: no se envía a cocina.
+se envia al servidor JSON cuando esta conectado. Salon lo recibe y lo envia a cocina.
