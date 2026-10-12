@@ -6,20 +6,21 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Editor de diseño y carta</title>
     <link rel="stylesheet" href="editor.css">
-    <link rel="stylesheet" href="editor-studio.css">
+    <link rel="stylesheet" href="editor-studio.css?v=2">
     <script defer src="assets/lucide.min.js"></script>
     <script defer src="assets/offline-data.js"></script>
     <script defer src="config-utils.js"></script>
     <script defer src="config/backend.js"></script>
     <script defer src="h52-backend.js"></script>
     <script defer src="editor-sync.js"></script>
-    <script defer src="editor.js"></script>
+    <script defer src="editor-tools.js?v=2"></script>
+    <script defer src="editor.js?v=2"></script>
 </head>
 
 <body data-role="waiter">
     <header><a href="index.html" title="Volver a la web" aria-label="Volver a la web"><i
                 data-lucide="arrow-left"></i></a>
-        <h1>Diseño & carta</h1>
+        <h1>H52 <span class="editor-heading">Editor de carta</span></h1>
         <div class="history-tools"><button id="undo" title="Deshacer" aria-label="Deshacer" disabled><i
                     data-lucide="undo-2"></i></button><button id="redo" title="Rehacer" aria-label="Rehacer" disabled><i
                     data-lucide="redo-2"></i></button></div>
@@ -28,8 +29,7 @@
     </header>
     <main>
         <section class="editor-panel">
-            <nav class="editor-tabs"><button data-tab="design" class="active">Diseño</button><button
-                    data-tab="products">Productos</button><button data-tab="json">JSON</button></nav>
+            <nav class="editor-tabs" aria-label="Edicion"><button data-tab="products" class="active"><i data-lucide="utensils"></i>Productos</button><button data-tab="design"><i data-lucide="palette"></i>Diseño</button><button data-tab="service"><i data-lucide="settings-2"></i>Servicio</button><button data-tab="json" title="Importar y exportar JSON" aria-label="Archivos JSON"><i data-lucide="file-json"></i></button></nav>
             <p id="editor-status" role="status">Cargando…</p>
             <div class="shared-tools">
                 <p id="shared-status" role="status">Conectando guardado compartido...</p>
@@ -39,7 +39,7 @@
             </div>
             <div id="draft-tools" hidden><span>Borrador disponible</span><button id="restore-draft">Recuperar</button>
             </div>
-            <div id="design-tab" class="editor-view">
+            <div id="design-tab" class="editor-view" hidden>
                 <details open>
                     <summary>Identidad</summary>
                     <div id="brand-fields"></div>
@@ -70,7 +70,12 @@
                     <div id="label-fields"></div>
                 </details>
             </div>
-            <div id="products-tab" class="editor-view" hidden>
+            <div id="products-tab" class="editor-view">
+                <div class="catalog-search"><i data-lucide="search"></i><input id="editor-search" type="search" placeholder="Buscar producto" aria-label="Buscar producto"></div>
+                <div class="catalog-filters"><select id="editor-category" aria-label="Filtrar categoria"></select><select id="editor-availability" aria-label="Filtrar disponibilidad"><option value="all">Todos</option><option value="available">Disponibles</option><option value="unavailable">No disponibles</option><option value="featured">Destacados</option></select></div>
+                <div class="catalog-caption"><span id="editor-count"></span><button id="select-results" title="Seleccionar resultados" aria-label="Seleccionar resultados"><i data-lucide="list-checks"></i></button><button id="clear-selection" title="Limpiar seleccion" aria-label="Limpiar seleccion"><i data-lucide="list-x"></i></button></div>
+                <div id="editor-catalog" class="editor-catalog"></div>
+                <div id="bulk-tools" class="bulk-tools" hidden><strong id="bulk-count"></strong><select id="bulk-action" aria-label="Accion para seleccion"><option value="percent">Cambiar precio %</option><option value="amount">Sumar al precio</option><option value="available">Marcar disponible</option><option value="unavailable">Marcar no disponible</option><option value="featured">Destacar</option><option value="unfeatured">Quitar destacado</option></select><input id="bulk-value" type="number" value="10" step="any" aria-label="Ajuste de precio"><button id="bulk-apply">Aplicar</button></div>
                 <details>
                     <summary>Categorías</summary>
                     <div class="product-tools"><select id="category-select"
@@ -78,6 +83,7 @@
                             title="Nueva categoría" aria-label="Nueva categoría"><i data-lucide="plus"></i></button>
                     </div>
                     <div id="category-fields"></div>
+                    <div class="category-actions"><button id="category-up" title="Subir categoria" aria-label="Subir categoria"><i data-lucide="arrow-up"></i></button><button id="category-down" title="Bajar categoria" aria-label="Bajar categoria"><i data-lucide="arrow-down"></i></button><button id="delete-category" title="Eliminar categoria vacia" aria-label="Eliminar categoria vacia"><i data-lucide="trash-2"></i></button></div>
                 </details>
                 <div class="product-tools"><select id="product-select"
                         aria-label="Seleccionar producto"></select><button id="new-product" title="Nuevo producto"
@@ -87,7 +93,9 @@
                         aria-label="Eliminar producto"><i data-lucide="trash-2"></i></button></div>
                 <div id="product-fields"></div>
             </div>
+            <div id="service-tab" class="editor-view" hidden><h2>Mesas y pedidos</h2><div id="service-fields"></div><label class="field">Mesas<input id="service-tables" type="text" aria-label="Mesas" placeholder="1, 2, 3, Terraza"></label><button id="apply-tables"><i data-lucide="check"></i>Actualizar mesas</button></div>
             <div id="json-tab" class="editor-view" hidden>
+                <div class="file-controls"><button data-export="design"><i data-lucide="download"></i>Diseño JSON</button><button data-export="products"><i data-lucide="download"></i>Productos JSON</button></div>
                 <div class="file-controls"><label class="file-button"><i data-lucide="upload"></i>Cargar diseño<input
                             type="file" id="import-design" accept=".json,application/json"></label><label
                         class="file-button"><i data-lucide="upload"></i>Cargar productos<input type="file"
@@ -99,7 +107,7 @@
                         data-lucide="download"></i>Copia para abrir sin servidor</button>
             </div>
         </section>
-        <section class="preview-panel">
+        <section class="preview-panel" id="preview-panel">
             <div class="preview-toolbar"><select id="preview-route" aria-label="Página de vista previa">
                     <option value="inicio">Inicio</option>
                     <option value="carta">Carta</option>
@@ -115,6 +123,8 @@
             </div>
         </section>
     </main>
+    <button id="toggle-preview" class="preview-toggle"><i data-lucide="eye"></i>Vista previa</button>
+    <dialog id="image-dialog" aria-labelledby="image-dialog-title"><div class="dialog-heading"><h2 id="image-dialog-title">Fotos de la carta</h2><button data-close-images title="Cerrar" aria-label="Cerrar fotos"><i data-lucide="x"></i></button></div><input id="image-search" type="search" placeholder="Buscar foto" aria-label="Buscar foto"><div id="image-gallery" class="image-gallery"></div></dialog>
 </body>
 
 </html>

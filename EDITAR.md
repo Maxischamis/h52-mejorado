@@ -4,6 +4,16 @@
 
 ### Compartido entre celulares
 
+El editor abre en Productos: busca por nombre, filtra categoria/disponibilidad,
+elige un producto con foto y edita sus secciones. Disponible se cambia tambien
+desde la lista. Para cambios por lote, selecciona productos con sus casillas,
+elige el ajuste y pulsa Aplicar; Deshacer recupera el estado anterior.
+Los extras se editan en Opciones y extras, sin escribir JSON. Foto permite
+elegir del catalogo existente o escribir una direccion de imagen propia.
+Servicio permite editar mesas, moneda, servicio y limites de cantidad.
+En celular, Vista previa alterna entre la carta y los controles de edicion.
+Archivos JSON conserva importacion y exportacion de copias.
+
 Abri `editor.html` desde el servidor H52, ingresa con la clave de salon y usa
 **Guardar compartido**. La carta y los editores sin cambios pendientes consultan
 el servidor cada dos segundos; al volver a una pestaña del editor se actualiza tambien.
