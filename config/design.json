@@ -12,12 +12,12 @@
     "surfaceRaised": "#1b2223",
     "text": "#f6f4f0",
     "muted": "#a8b2b0",
-    "accent": "#ff2436",
+    "accent": "#ef5462",
     "accentText": "#190c10",
     "secondary": "#b5d5ca",
     "border": "#303a3b",
     "heroShade": "#080b0c",
-    "fontDisplay": "Trebuchet MS, sans-serif",
+    "fontDisplay": "'Bodoni 72', 'Didot', 'Times New Roman', serif",
     "fontBody": "Arial, Helvetica, sans-serif",
     "cardRadius": 8,
     "contentWidth": 1320
@@ -27,10 +27,11 @@
     "imageAlt": "Negroni con naranja y romero en cristal tallado",
     "eyebrow": "COCINA HONESTA. NOCHES EXTRAORDINARIAS.",
     "titleLines": [
-      "Hangar",
-      "52"
+      "Comé.",
+      "Tomá.",
+      "Disfrutá."
     ],
-    "accentLine": 1,
+    "accentLine": 2,
     "description": "La mesa está lista. La noche, por empezar.",
     "button": "Descubrí la carta",
     "caption": "H52 · BAR & COCINA",
